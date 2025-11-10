@@ -1,7 +1,16 @@
 import sqlite3
+import csv
 import datetime
 import csv
 import os
+from config import settings
+
+# --- Configuration ---
+DATABASE_NAME = settings.DATABASE_NAME
+ADMIN_USERNAME = settings.ADMIN_USERNAME
+ADMIN_PASSWORD = settings.ADMIN_PASSWORD
+CSV_EXPORT_FILENAME = settings.CSV_EXPORT_FILENAME
+INITIAL_ACCOUNTS_FILE = settings.INITIAL_ACCOUNTS_FILE
 
 
 class DatabaseManager:
@@ -75,7 +84,6 @@ class DatabaseManager:
 
         print("Loading data from system_transactions.csv...")
 
-        import csv, os
         if not os.path.exists(INITIAL_ACCOUNTS_FILE):
             print(f"⚠ CSV file not found: {INITIAL_ACCOUNTS_FILE}")
             return

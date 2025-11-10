@@ -40,3 +40,12 @@ data/backups/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment files
+.env
+*.env.local
+*.env.production
+
+# Config overrides
+config/local.py
+config/override.py

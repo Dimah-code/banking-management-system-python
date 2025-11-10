@@ -1,20 +1,7 @@
-
 import sqlite3
 import datetime
 import csv
 import os
-
-# --- Configuration ---
-DATABASE_NAME = "banking_data.db"
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "adminpass" 
-CSV_EXPORT_FILENAME = r"c:\Users\hp\Desktop\project.py\system_transactions.csv"
-
-
-
-# Path to external CSV for initial user accounts
-# Make sure your file exists at this path
-INITIAL_ACCOUNTS_FILE = r"c:\Users\hp\Desktop\project.py\system_transactions.csv"
 
 
 class DatabaseManager:

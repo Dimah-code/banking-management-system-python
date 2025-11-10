@@ -11,7 +11,7 @@ def setup_environment():
         shutil.copy(env_example, env_file)
         print("Created .env file from example. Please edit it with your settings.")
     else:
-        print(".env file already exists.")
+        print(".env file already exists. check it out!")
     
     # Create necessary directories
     Path("data/exports").mkdir(parents=True, exist_ok=True)

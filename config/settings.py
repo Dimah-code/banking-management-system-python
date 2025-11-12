@@ -15,11 +15,6 @@ DATABASES_DIR.mkdir(parents=True, exist_ok=True)
 DATABASE_NAME = os.getenv("DATABASE_NAME", "banking_data.db")  # ✅ اول تعریف کن
 DATABASE_PATH = DATABASES_DIR / DATABASE_NAME
 
-# حالا می‌تونی چاپ کنی
-print(f"DATABASES_DIR: {DATABASES_DIR}")
-print(f"DATABASE_NAME: {DATABASE_NAME}")
-print(f"Type of DATABASE_NAME: {type(DATABASE_NAME)}")
-
 # Admin credentials
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")

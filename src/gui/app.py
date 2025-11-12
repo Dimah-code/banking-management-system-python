@@ -4,10 +4,15 @@ from tkinter import ttk, messagebox
 from config.settings import *
 from database.manager import DatabaseManager
 from utils.sorting import merge_sort
-from gui.frames import (
+
+# Import from the frames package directly
+from .frames import (
     WelcomeFrame, RegisterFrame, LoginFrame, AdminLoginFrame,
     UserHomeFrame, AdminDashboardFrame
 )
+
+# Import widgets directly from the same package
+from .widgets import BaseContentFrame, UserSidebar, AdminSidebar
 
 
 class BankingApp(tk.Tk):
@@ -16,22 +21,23 @@ class BankingApp(tk.Tk):
     Manages frames (views) and holds the DatabaseManager instance.
     """
     def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
-        self.title(APP_NAME)
-        self.geometry("1000x650")
-        self.resizable(False, False)
-        self.config(bg=BG_DARK)
+            super().__init__(*args, **kwargs)  # ← CHANGE THIS LINE
+            self.title(APP_NAME)
+            self.geometry("1000x650")
+            self.resizable(False, False)
+            self.config(bg=BG_DARK)
 
-        try:
-            # Initialize the database connection manager
-            self.db = DatabaseManager()
-        except ConnectionError as e:
-            messagebox.showerror("Database Startup Error", str(e))
-            self.quit()
-        
-        self._setup_styles()
-        self._setup_ui()
-        self._reset_session()
+            try:
+                # Initialize the database connection manager
+                self.db = DatabaseManager()
+            except ConnectionError as e:
+                messagebox.showerror("Database Startup Error", str(e))
+                self.quit()
+            
+            self._setup_styles()
+            self._setup_ui()
+            self._reset_session()
+
 
     def _setup_styles(self):
         """Configure modern Tkinter styles for improved UX"""
@@ -65,24 +71,26 @@ class BankingApp(tk.Tk):
         style.configure("Treeview.Heading", font=FONT_STYLE, background=SIDEBAR_COLOR, foreground=FG_LIGHT, padding=5)
         style.configure("Treeview", background=BG_PRIMARY, foreground=FG_LIGHT, fieldbackground=BG_PRIMARY, rowheight=25)
 
+
     def _setup_ui(self):
         """Setup the main UI container and frames"""
         # Container setup for frames
-        container = tk.Frame(self, bg=BG_DARK)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        self._container = tk.Frame(self, bg=BG_DARK)  # Make it instance variable
+        self._container.pack(side="top", fill="both", expand=True)
+        self._container.grid_rowconfigure(0, weight=1)
+        self._container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
         
         # Define all available frames
         for F in (WelcomeFrame, RegisterFrame, LoginFrame, AdminLoginFrame, UserHomeFrame, AdminDashboardFrame):
             page_name = F.__name__
-            frame = F(parent=container, controller=self)
+            frame = F(parent=self._container, controller=self)  # Pass self (BankingApp)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("WelcomeFrame")
+
 
     def _reset_session(self):
         """Reset user session data"""

@@ -3,14 +3,9 @@ import csv
 import datetime
 import csv
 import os
-from config import settings
-
-# --- Configuration ---
-DATABASE_NAME = settings.DATABASE_NAME
-ADMIN_USERNAME = settings.ADMIN_USERNAME
-ADMIN_PASSWORD = settings.ADMIN_PASSWORD
-CSV_EXPORT_FILENAME = settings.CSV_EXPORT_FILENAME
-INITIAL_ACCOUNTS_FILE = settings.INITIAL_ACCOUNTS_FILE
+from config.settings import(
+    DATABASE_NAME, ADMIN_USERNAME, ADMIN_PASSWORD, CSV_EXPORT_FILENAME, INITIAL_ACCOUNTS_FILE
+)
 
 
 class DatabaseManager:

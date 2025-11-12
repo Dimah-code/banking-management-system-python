@@ -1,5 +1,4 @@
-from gui import BankingApp
-
+from gui.gui import BankingApp
 if __name__ == "__main__":
     app = BankingApp()
     app.mainloop()

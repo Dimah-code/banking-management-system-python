@@ -1,23 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-from database import DatabaseManager, CSV_EXPORT_FILENAME # Import CSV_EXPORT_FILENAME
-
-# --- Configuration (Dark Mode Theme) ---
-BG_DARK = "#1a1a2e"         # Deep Navy Blue Background (Container)
-BG_PRIMARY = "#16213e"      # Richer blue for main content
-FG_LIGHT = "#eeeeee"        # Lighter text for better contrast
-ACCENT_BLUE = "#0f3460"     # Deep Royal Blue accent
-SIDEBAR_COLOR = "#0d0d1a"   # Very dark navy for the sidebar
-SUCCESS_GREEN = "#4ade80"   # Modern vibrant green
-WARNING_RED = "#f87171"     # Soft red for warnings
-ADMIN_COLOR = "#fbbf24"     # Amber gold for admin
-
-# Fonts
-FONT_STYLE = ("Inter", 12)
-HEADER_FONT_STYLE = ("Inter", 16, "bold")
-TITLE_FONT_STYLE = ("Inter", 28, "bold")
-BUTTON_FONT_STYLE = ("Inter", 14, "bold")
-
+from src.database.manager import DatabaseManager
+from config import settings
 
 # --- DAA ALGORITHM IMPLEMENTATION: Merge Sort O(N log N) ---
 def merge_sort(arr, key_index, ascending=True):
@@ -86,7 +70,7 @@ class BankingApp(tk.Tk):
         self.geometry("1000x650")
         self.resizable(False, False)
         
-        self.config(bg=BG_DARK)
+        self.config(bg=settings.BG_DARK)
 
         try:
             # Initialize the database connection manager
@@ -100,33 +84,33 @@ class BankingApp(tk.Tk):
         style.theme_use('clam')
         
         # General Styles
-        style.configure('.', font=FONT_STYLE, background=BG_PRIMARY, foreground=FG_LIGHT)
-        style.configure('TFrame', background=BG_PRIMARY)
-        style.configure('TLabel', background=BG_PRIMARY, foreground=FG_LIGHT)
-        style.configure('TEntry', fieldbackground=BG_DARK, foreground=FG_LIGHT, borderwidth=1, relief="flat", padding=5)
+        style.configure('.', font=settings.FONT_STYLE, background=settings.BG_PRIMARY, foreground=settings.FG_LIGHT)
+        style.configure('TFrame', background=settings.BG_PRIMARY)
+        style.configure('TLabel', background=settings.BG_PRIMARY, foreground=settings.FG_LIGHT)
+        style.configure('TEntry', fieldbackground=settings.BG_DARK, foreground=settings.FG_LIGHT, borderwidth=1, relief="flat", padding=5)
         
         # Primary Button style (Blue)
-        style.configure('T.TButton', font=BUTTON_FONT_STYLE, padding=[20, 10], 
-                        background=ACCENT_BLUE, foreground=FG_LIGHT, borderwidth=0, relief="flat")
-        style.map('T.TButton', background=[('active', '#1a3d7a')], foreground=[('active', FG_LIGHT)])
+        style.configure('T.TButton', font=settings.settings.BUTTON_FONT_STYLE, padding=[20, 10], 
+                        background=settings.ACCENT_BLUE, foreground=settings.FG_LIGHT, borderwidth=0, relief="flat")
+        style.map('T.TButton', background=[('active', '#1a3d7a')], foreground=[('active', settings.FG_LIGHT)])
 
         # Action Button style (Green for transactions/confirmations)
-        style.configure('Action.TButton', font=BUTTON_FONT_STYLE, padding=[15, 8], 
-                        background=SUCCESS_GREEN, foreground=BG_DARK, borderwidth=0, relief="flat")
-        style.map('Action.TButton', background=[('active', '#3bbd60')], foreground=[('active', BG_DARK)])
+        style.configure('Action.TButton', font=settings.settings.BUTTON_FONT_STYLE, padding=[15, 8], 
+                        background=settings.SUCCESS_GREEN, foreground=settings.BG_DARK, borderwidth=0, relief="flat")
+        style.map('Action.TButton', background=[('active', '#3bbd60')], foreground=[('active', settings.BG_DARK)])
         
         # Logout/Admin Button styles
-        style.configure('Logout.TButton', font=BUTTON_FONT_STYLE, padding=[15, 8], 
-                        background=WARNING_RED, foreground=FG_LIGHT, borderwidth=0, relief="flat")
-        style.map('Logout.TButton', background=[('active', '#e55c5c')], foreground=[('active', FG_LIGHT)])
+        style.configure('Logout.TButton', font=settings.settings.BUTTON_FONT_STYLE, padding=[15, 8], 
+                        background=settings.WARNING_RED, foreground=settings.FG_LIGHT, borderwidth=0, relief="flat")
+        style.map('Logout.TButton', background=[('active', '#e55c5c')], foreground=[('active', settings.FG_LIGHT)])
         
-        style.configure('Admin.TButton', font=BUTTON_FONT_STYLE, padding=[15, 8], 
-                        background=ADMIN_COLOR, foreground=BG_DARK, borderwidth=0, relief="flat")
-        style.map('Admin.TButton', background=[('active', '#f5a623')], foreground=[('active', BG_DARK)])
+        style.configure('Admin.TButton', font=settings.settings.BUTTON_FONT_STYLE, padding=[15, 8], 
+                        background=settings.ADMIN_COLOR, foreground=settings.BG_DARK, borderwidth=0, relief="flat")
+        style.map('Admin.TButton', background=[('active', '#f5a623')], foreground=[('active', settings.BG_DARK)])
         
         # Treeview (Statement) styling - Improved readability
-        style.configure("Treeview.Heading", font=FONT_STYLE, background=SIDEBAR_COLOR, foreground=FG_LIGHT, padding=5)
-        style.configure("Treeview", background=BG_PRIMARY, foreground=FG_LIGHT, fieldbackground=BG_PRIMARY, rowheight=25)
+        style.configure("Treeview.Heading", font=settings.FONT_STYLE, background=settings.SIDEBAR_COLOR, foreground=settings.FG_LIGHT, padding=5)
+        style.configure("Treeview", background=settings.BG_PRIMARY, foreground=settings.FG_LIGHT, fieldbackground=settings.BG_PRIMARY, rowheight=25)
         
         self.current_user_id = None
         self.current_username = None
@@ -139,7 +123,7 @@ class BankingApp(tk.Tk):
         self.sorted_all_transactions = None
 
         # Container setup for frames
-        container = tk.Frame(self, bg=BG_DARK)
+        container = tk.Frame(self, bg=settings.BG_DARK)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
@@ -268,7 +252,7 @@ class BaseContentFrame(tk.Frame):
     It sets up the left sidebar and the main content area.
     """
     def __init__(self, parent, controller, sidebar_class):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
 
         # 1. Grid setup: Sidebar on the left (25%), Content on the right (75%)
@@ -281,7 +265,7 @@ class BaseContentFrame(tk.Frame):
         self.sidebar.grid(row=0, column=0, sticky="nsew")
 
         # 3. Main Content Container
-        self.content_container = tk.Frame(self, bg=BG_PRIMARY, padx=20, pady=20)
+        self.content_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=20, pady=20)
         self.content_container.grid(row=0, column=1, sticky="nsew")
 
         # Initialize the sub-frames dictionary
@@ -319,12 +303,12 @@ class BaseContentFrame(tk.Frame):
 
 class UserSidebar(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=SIDEBAR_COLOR)
+        tk.Frame.__init__(self, parent, bg=settings.SIDEBAR_COLOR)
         self.controller = controller
         
         self.columnconfigure(0, weight=1)
         
-        tk.Label(self, text="Bank App", font=HEADER_FONT_STYLE, bg=SIDEBAR_COLOR, fg=ACCENT_BLUE).grid(row=0, column=0, pady=(30, 20), sticky="n")
+        tk.Label(self, text="Bank App", font=settings.HEADER_FONT_STYLE, bg=settings.SIDEBAR_COLOR, fg=settings.ACCENT_BLUE).grid(row=0, column=0, pady=(30, 20), sticky="n")
 
         self.buttons = {
             "Balance": {"row": 1, "target": "AccountSummaryFrame", "icon": "🏠"},
@@ -348,11 +332,11 @@ class UserSidebar(tk.Frame):
 
 class AdminSidebar(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=SIDEBAR_COLOR)
+        tk.Frame.__init__(self, parent, bg=settings.SIDEBAR_COLOR)
         self.controller = controller
         self.columnconfigure(0, weight=1)
         
-        tk.Label(self, text="Admin Console", font=HEADER_FONT_STYLE, bg=SIDEBAR_COLOR, fg=ADMIN_COLOR).grid(row=0, column=0, pady=(30, 20), sticky="n")
+        tk.Label(self, text="Admin Console", font=settings.HEADER_FONT_STYLE, bg=settings.SIDEBAR_COLOR, fg=settings.ADMIN_COLOR).grid(row=0, column=0, pady=(30, 20), sticky="n")
 
         self.buttons = {
             "Dashboard": {"row": 1, "target": "AdminOverviewFrame", "icon": "📊"},
@@ -400,7 +384,7 @@ class AdminDashboardFrame(BaseContentFrame):
 # --- Authentication Frames (Unchanged) ---
 class WelcomeFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_DARK)
+        tk.Frame.__init__(self, parent, bg=settings.BG_DARK)
         self.controller = controller
         
         # Center the content
@@ -409,8 +393,8 @@ class WelcomeFrame(tk.Frame):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(6, weight=1)
 
-        tk.Label(self, text="Secure Banking", font=TITLE_FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT).grid(row=1, column=0, columnspan=2, pady=(0, 10))
-        tk.Label(self, text="Login or Register to access your account.", font=HEADER_FONT_STYLE, bg=BG_DARK, fg=ACCENT_BLUE).grid(row=2, column=0, columnspan=2, pady=(10, 40))
+        tk.Label(self, text="Secure Banking", font=settings.TITLE_FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT).grid(row=1, column=0, columnspan=2, pady=(0, 10))
+        tk.Label(self, text="Login or Register to access your account.", font=settings.HEADER_FONT_STYLE, bg=settings.BG_DARK, fg=settings.ACCENT_BLUE).grid(row=2, column=0, columnspan=2, pady=(10, 40))
         
         login_btn = ttk.Button(self, text="User Login", style='T.TButton',
                                command=lambda: controller.show_frame("LoginFrame"))
@@ -424,30 +408,30 @@ class WelcomeFrame(tk.Frame):
                                      command=lambda: controller.show_frame("AdminLoginFrame"))
         admin_login_btn.grid(row=4, column=0, columnspan=2, pady=(20, 10), ipadx=40)
         
-        tk.Label(self, text="Powered by Python Tkinter", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT).grid(row=5, column=0, columnspan=2, pady=(80, 0))
+        tk.Label(self, text="Powered by Python Tkinter", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT).grid(row=5, column=0, columnspan=2, pady=(80, 0))
 
 
 class RegisterFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_DARK)
+        tk.Frame.__init__(self, parent, bg=settings.BG_DARK)
         self.controller = controller
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(7, weight=1)
 
-        tk.Label(self, text="Create New Account", font=TITLE_FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT).grid(row=1, column=0, columnspan=2, pady=(40, 30))
+        tk.Label(self, text="Create New Account", font=settings.TITLE_FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT).grid(row=1, column=0, columnspan=2, pady=(40, 30))
 
         # Input fields...
-        tk.Label(self, text="Username:", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=2, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Username:", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=2, column=0, padx=50, pady=10, sticky="w")
         self.username_entry = ttk.Entry(self, width=40)
         self.username_entry.grid(row=2, column=1, padx=50, pady=10, sticky="ew")
 
-        tk.Label(self, text="Password:", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=3, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Password:", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=3, column=0, padx=50, pady=10, sticky="w")
         self.password_entry = ttk.Entry(self, show="*", width=40)
         self.password_entry.grid(row=3, column=1, padx=50, pady=10, sticky="ew")
         
-        tk.Label(self, text="Initial Deposit ($):", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=4, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Initial Deposit ($):", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=4, column=0, padx=50, pady=10, sticky="w")
         self.deposit_entry = ttk.Entry(self, width=40)
         self.deposit_entry.grid(row=4, column=1, padx=50, pady=10, sticky="ew")
         self.deposit_entry.insert(0, "0.00")
@@ -489,21 +473,21 @@ class RegisterFrame(tk.Frame):
 
 class LoginFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_DARK)
+        tk.Frame.__init__(self, parent, bg=settings.BG_DARK)
         self.controller = controller
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(6, weight=1)
         
-        tk.Label(self, text="Account Login", font=TITLE_FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT).grid(row=1, column=0, columnspan=2, pady=(40, 30))
+        tk.Label(self, text="Account Login", font=settings.TITLE_FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT).grid(row=1, column=0, columnspan=2, pady=(40, 30))
 
         # Input fields...
-        tk.Label(self, text="Username:", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=2, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Username:", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=2, column=0, padx=50, pady=10, sticky="w")
         self.username_entry = ttk.Entry(self, width=40)
         self.username_entry.grid(row=2, column=1, padx=50, pady=10, sticky="ew")
 
-        tk.Label(self, text="Password:", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=3, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Password:", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=3, column=0, padx=50, pady=10, sticky="w")
         self.password_entry = ttk.Entry(self, show="*", width=40)
         self.password_entry.grid(row=3, column=1, padx=50, pady=10, sticky="ew")
 
@@ -538,22 +522,22 @@ class LoginFrame(tk.Frame):
 
 class AdminLoginFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_DARK)
+        tk.Frame.__init__(self, parent, bg=settings.BG_DARK)
         self.controller = controller
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(6, weight=1)
         
-        tk.Label(self, text="Admin Login", font=TITLE_FONT_STYLE, bg=BG_DARK, fg=ADMIN_COLOR).grid(row=1, column=0, columnspan=2, pady=(40, 30))
-        tk.Label(self, text="Access System Management Tools", font=HEADER_FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT).grid(row=2, column=0, columnspan=2, pady=(0, 20))
+        tk.Label(self, text="Admin Login", font=settings.TITLE_FONT_STYLE, bg=settings.BG_DARK, fg=settings.ADMIN_COLOR).grid(row=1, column=0, columnspan=2, pady=(40, 30))
+        tk.Label(self, text="Access System Management Tools", font=settings.HEADER_FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT).grid(row=2, column=0, columnspan=2, pady=(0, 20))
 
         # Input fields...
-        tk.Label(self, text="Admin Username:", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=3, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Admin Username:", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=3, column=0, padx=50, pady=10, sticky="w")
         self.username_entry = ttk.Entry(self, width=40)
         self.username_entry.grid(row=3, column=1, padx=50, pady=10, sticky="ew")
 
-        tk.Label(self, text="Admin Password:", font=FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT, anchor="w").grid(row=4, column=0, padx=50, pady=10, sticky="w")
+        tk.Label(self, text="Admin Password:", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT, anchor="w").grid(row=4, column=0, padx=50, pady=10, sticky="w")
         self.password_entry = ttk.Entry(self, show="*")
         self.password_entry.grid(row=4, column=1, padx=50, pady=10, sticky="ew")
 
@@ -585,26 +569,26 @@ class AdminLoginFrame(tk.Frame):
 # --- User Sub-Frames (Unchanged) ---
 class AccountSummaryFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
 
-        tk.Label(self, text="Account Overview", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=(10, 20))
+        tk.Label(self, text="Account Overview", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=(10, 20))
 
         # Balance display
-        self.balance_frame = tk.Frame(self, bg=ACCENT_BLUE, padx=40, pady=30, relief="flat")
+        self.balance_frame = tk.Frame(self, bg=settings.ACCENT_BLUE, padx=40, pady=30, relief="flat")
         self.balance_frame.pack(pady=20, padx=50, fill="x")
         
-        tk.Label(self.balance_frame, text="Current Balance:", font=HEADER_FONT_STYLE, 
-                 bg=ACCENT_BLUE, fg=BG_DARK).pack()
+        tk.Label(self.balance_frame, text="Current Balance:", font=settings.HEADER_FONT_STYLE, 
+                 bg=settings.ACCENT_BLUE, fg=settings.BG_DARK).pack()
                  
         self.balance_label = tk.Label(self.balance_frame, text="$0.00", font=("Inter", 48, "bold"), 
-                                      bg=ACCENT_BLUE, fg=BG_DARK)
+                                      bg=settings.ACCENT_BLUE, fg=settings.BG_DARK)
         self.balance_label.pack(pady=10)
 
-        tk.Label(self, text="Quick Actions:", font=HEADER_FONT_STYLE, bg=BG_PRIMARY, fg=ACCENT_BLUE).pack(pady=(30, 10))
+        tk.Label(self, text="Quick Actions:", font=settings.HEADER_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.ACCENT_BLUE).pack(pady=(30, 10))
 
         # Quick action buttons
-        actions_frame = tk.Frame(self, bg=BG_PRIMARY)
+        actions_frame = tk.Frame(self, bg=settings.BG_PRIMARY)
         actions_frame.pack(pady=10)
         
         # Link quick actions to sidebar functionality
@@ -629,15 +613,15 @@ class AccountSummaryFrame(tk.Frame):
 
 class DepositFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
         
-        deposit_container = tk.Frame(self, bg=BG_PRIMARY, padx=50, pady=30)
+        deposit_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=50, pady=30)
         deposit_container.pack(fill="both", expand=True)
 
-        tk.Label(deposit_container, text="Deposit Money", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=SUCCESS_GREEN).pack(pady=(10, 30))
+        tk.Label(deposit_container, text="Deposit Money", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.SUCCESS_GREEN).pack(pady=(10, 30))
 
-        tk.Label(deposit_container, text="Amount ($):", font=HEADER_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=5)
+        tk.Label(deposit_container, text="Amount ($):", font=settings.HEADER_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=5)
         self.amount_entry = ttk.Entry(deposit_container, width=30, justify='center')
         self.amount_entry.pack(pady=10, ipadx=20)
 
@@ -679,15 +663,15 @@ class DepositFrame(tk.Frame):
 
 class WithdrawFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
         
-        withdraw_container = tk.Frame(self, bg=BG_PRIMARY, padx=50, pady=30)
+        withdraw_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=50, pady=30)
         withdraw_container.pack(fill="both", expand=True)
 
-        tk.Label(withdraw_container, text="Withdraw Money", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=WARNING_RED).pack(pady=(10, 30))
+        tk.Label(withdraw_container, text="Withdraw Money", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.WARNING_RED).pack(pady=(10, 30))
 
-        tk.Label(withdraw_container, text="Amount ($):", font=HEADER_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=5)
+        tk.Label(withdraw_container, text="Amount ($):", font=settings.HEADER_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=5)
         self.amount_entry = ttk.Entry(withdraw_container, width=30, justify='center')
         self.amount_entry.pack(pady=10, ipadx=20)
 
@@ -733,19 +717,19 @@ class WithdrawFrame(tk.Frame):
 
 class TransferFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
         
-        transfer_container = tk.Frame(self, bg=BG_PRIMARY, padx=50, pady=30)
+        transfer_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=50, pady=30)
         transfer_container.pack(fill="both", expand=True)
 
-        tk.Label(transfer_container, text="Transfer Funds", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=ACCENT_BLUE).pack(pady=(10, 30))
+        tk.Label(transfer_container, text="Transfer Funds", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.ACCENT_BLUE).pack(pady=(10, 30))
 
-        tk.Label(transfer_container, text="Recipient Username:", font=HEADER_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=5)
+        tk.Label(transfer_container, text="Recipient Username:", font=settings.HEADER_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=5)
         self.recipient_entry = ttk.Entry(transfer_container, width=30, justify='center')
         self.recipient_entry.pack(pady=5, ipadx=20)
         
-        tk.Label(transfer_container, text="Amount ($):", font=HEADER_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=5)
+        tk.Label(transfer_container, text="Amount ($):", font=settings.HEADER_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=5)
         self.amount_entry = ttk.Entry(transfer_container, width=30, justify='center')
         self.amount_entry.pack(pady=10, ipadx=20)
 
@@ -811,13 +795,13 @@ class TransferFrame(tk.Frame):
 
 class StatementFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
         
-        statement_container = tk.Frame(self, bg=BG_PRIMARY, padx=20, pady=20)
+        statement_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=20, pady=20)
         statement_container.pack(fill="both", expand=True)
         
-        tk.Label(statement_container, text="Account Statement", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=(10, 20))
+        tk.Label(statement_container, text="Account Statement", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=(10, 20))
         
         # Treeview setup
         columns = ("Timestamp", "Type", "Amount", "Description")
@@ -888,8 +872,8 @@ class StatementFrame(tk.Frame):
             
         # Configure the color tags for the rows
         try:
-            self.statement_tree.tag_configure('green', foreground=SUCCESS_GREEN)
-            self.statement_tree.tag_configure('red', foreground=WARNING_RED)
+            self.statement_tree.tag_configure('green', foreground=settings.SUCCESS_GREEN)
+            self.statement_tree.tag_configure('red', foreground=settings.WARNING_RED)
         except Exception:
             pass
 
@@ -898,23 +882,23 @@ class StatementFrame(tk.Frame):
 
 class AdminOverviewFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
 
-        tk.Label(self, text="Admin Dashboard", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=ADMIN_COLOR).pack(pady=(10, 20))
+        tk.Label(self, text="Admin Dashboard", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.ADMIN_COLOR).pack(pady=(10, 20))
         
-        tk.Label(self, text="System Statistics (WIP)", font=HEADER_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=10)
+        tk.Label(self, text="System Statistics (WIP)", font=settings.HEADER_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=10)
         
-        stats_frame = tk.Frame(self, bg=BG_DARK, padx=30, pady=30)
+        stats_frame = tk.Frame(self, bg=settings.BG_DARK, padx=30, pady=30)
         stats_frame.pack(pady=20, padx=50, fill="x")
         
-        self.total_accounts_label = tk.Label(stats_frame, text="Total Accounts: N/A", font=HEADER_FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT)
+        self.total_accounts_label = tk.Label(stats_frame, text="Total Accounts: N/A", font=settings.HEADER_FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT)
         self.total_accounts_label.pack(pady=5)
         
-        self.total_balance_label = tk.Label(stats_frame, text="Total Balance: N/A", font=HEADER_FONT_STYLE, bg=BG_DARK, fg=FG_LIGHT)
+        self.total_balance_label = tk.Label(stats_frame, text="Total Balance: N/A", font=settings.HEADER_FONT_STYLE, bg=settings.BG_DARK, fg=settings.FG_LIGHT)
         self.total_balance_label.pack(pady=5)
         
-        tk.Label(stats_frame, text="View 'Accounts' and 'Full Statement' for detailed data.", font=FONT_STYLE, bg=BG_DARK, fg=ACCENT_BLUE).pack(pady=20)
+        tk.Label(stats_frame, text="View 'Accounts' and 'Full Statement' for detailed data.", font=settings.FONT_STYLE, bg=settings.BG_DARK, fg=settings.ACCENT_BLUE).pack(pady=20)
 
     def on_show(self):
         all_accounts = self.controller.db.get_all_accounts_summary()
@@ -928,13 +912,13 @@ class AdminOverviewFrame(tk.Frame):
 
 class AdminAccountsFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
         
-        accounts_container = tk.Frame(self, bg=BG_PRIMARY, padx=20, pady=20)
+        accounts_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=20, pady=20)
         accounts_container.pack(fill="both", expand=True)
         
-        tk.Label(accounts_container, text="All Client Accounts", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=(10, 20))
+        tk.Label(accounts_container, text="All Client Accounts", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=(10, 20))
         
         columns = ("ID", "Username", "Balance")
         self.accounts_tree = ttk.Treeview(accounts_container, columns=columns, show="headings", height=15)
@@ -980,16 +964,16 @@ class AdminAccountsFrame(tk.Frame):
 
 class AdminStatementFrame(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg=BG_PRIMARY)
+        tk.Frame.__init__(self, parent, bg=settings.BG_PRIMARY)
         self.controller = controller
         
-        statement_container = tk.Frame(self, bg=BG_PRIMARY, padx=20, pady=20)
+        statement_container = tk.Frame(self, bg=settings.BG_PRIMARY, padx=20, pady=20)
         statement_container.pack(fill="both", expand=True)
         
-        tk.Label(statement_container, text="Full System Transaction History", font=TITLE_FONT_STYLE, bg=BG_PRIMARY, fg=FG_LIGHT).pack(pady=(10, 20))
+        tk.Label(statement_container, text="Full System Transaction History", font=settings.TITLE_FONT_STYLE, bg=settings.BG_PRIMARY, fg=settings.FG_LIGHT).pack(pady=(10, 20))
         
         # Frame for the Treeview and Scrollbar
-        tree_frame = tk.Frame(statement_container, bg=BG_PRIMARY)
+        tree_frame = tk.Frame(statement_container, bg=settings.BG_PRIMARY)
         tree_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
         # Treeview setup
@@ -1068,7 +1052,7 @@ class AdminStatementFrame(tk.Frame):
             self.statement_tree.insert("", "end", values=(timestamp, username, type, formatted_amount, description), tags=(tag,))
             
         try:
-            self.statement_tree.tag_configure('green', foreground=SUCCESS_GREEN)
-            self.statement_tree.tag_configure('red', foreground=WARNING_RED)
+            self.statement_tree.tag_configure('green', foreground=settings.SUCCESS_GREEN)
+            self.statement_tree.tag_configure('red', foreground=settings.WARNING_RED)
         except Exception:
             pass

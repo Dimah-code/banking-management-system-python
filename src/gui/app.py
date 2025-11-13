@@ -1,18 +1,27 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import os
+import sys
+
+# Add the src directory to Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from config.settings import *
 from database.manager import DatabaseManager
 from utils.sorting import merge_sort
 
-# Import from the frames package directly
-from .frames import (
-    WelcomeFrame, RegisterFrame, LoginFrame, AdminLoginFrame,
-    UserHomeFrame, AdminDashboardFrame
-)
+# Import frames using absolute imports
+from gui.frames.auth.welcome_frame import WelcomeFrame
+from gui.frames.auth.register_frame import RegisterFrame
+from gui.frames.auth.login_frame import LoginFrame
+from gui.frames.auth.admin_login_frame import AdminLoginFrame
+from gui.frames.user.user_home import UserHomeFrame
+from gui.frames.admin.admin_dashboard import AdminDashboardFrame
 
-# Import widgets directly from the same package
-from .widgets import BaseContentFrame, UserSidebar, AdminSidebar
+# Import widgets
+from gui.widgets import BaseContentFrame
+from gui.widgets import UserSidebar, AdminSidebar
+
 
 
 class BankingApp(tk.Tk):
@@ -28,12 +37,12 @@ class BankingApp(tk.Tk):
             self.config(bg=BG_DARK)
 
             try:
-                # Initialize the database connection manager
                 self.db = DatabaseManager()
-            except ConnectionError as e:
-                messagebox.showerror("Database Startup Error", str(e))
-                self.quit()
-            
+            except Exception as e:
+                messagebox.showerror("Database Startup Error", f"Failed to initialize database: {str(e)}")
+                self.destroy()  # Use destroy instead of quit
+                return  # Stop initialization if database fails
+
             self._setup_styles()
             self._setup_ui()
             self._reset_session()

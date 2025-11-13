@@ -1,18 +1,22 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 EXPORTS_DIR = DATA_DIR / "exports"
 DATABASES_DIR = DATA_DIR / "databases"
-
+BACKUPS_DIR = DATA_DIR / "backups"
 # Ensure directories exist
 EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
 DATABASES_DIR.mkdir(parents=True, exist_ok=True)
+BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Database configuration
-DATABASE_NAME = os.getenv("DATABASE_NAME", "banking_data.db")  # ✅ اول تعریف کن
+DATABASE_NAME = os.getenv("DATABASE_NAME", "banking_data.db")
 DATABASE_PATH = DATABASES_DIR / DATABASE_NAME
 
 # Admin credentials
@@ -21,7 +25,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 # File paths
 CSV_EXPORT_FILENAME = EXPORTS_DIR / "system_transactions.csv"
-INITIAL_ACCOUNTS_FILE = EXPORTS_DIR / "system_transactions.csv"  # این هم احتمالاً باید متفاوت باشد
+INITIAL_ACCOUNTS_FILE = BACKUPS_DIR / "system_backup.csv"
 
 
 # Theme

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional, Tuple, List, Union
 from config.settings import (
     DATABASE_NAME, ADMIN_USERNAME, ADMIN_PASSWORD, 
-    CSV_EXPORT_FILENAME, INITIAL_ACCOUNTS_FILE
+    CSV_EXPORT_FILENAME, INITIAL_ACCOUNTS_FILE, DATABASE_PATH
 )
 
 
@@ -26,7 +26,7 @@ class DatabaseManager:
     def _connect_db(self) -> sqlite3.Connection:
         """Establish database connection with error handling."""
         try:
-            return sqlite3.connect(DATABASE_NAME)
+            return sqlite3.connect(DATABASE_PATH)
         except sqlite3.Error as e:
             raise ConnectionError(f"Database connection failed: {e}")
 
@@ -78,12 +78,18 @@ class DatabaseManager:
     def _create_default_admin(self):
         """Create default admin account if it doesn't exist."""
         cursor = self.db_conn.cursor()
-        cursor.execute("SELECT id FROM admins WHERE username=?", (ADMIN_USERNAME,))
-        if cursor.fetchone() is None:
-            cursor.execute(
-                "INSERT INTO admins (username, password) VALUES (?, ?)", 
-                (ADMIN_USERNAME, ADMIN_PASSWORD)
-            )
+        try:
+            cursor.execute("SELECT id FROM admins WHERE username=?", (ADMIN_USERNAME,))
+            if cursor.fetchone() is None:
+                cursor.execute(
+                    "INSERT INTO admins (username, password) VALUES (?, ?)", 
+                    (ADMIN_USERNAME, ADMIN_PASSWORD)
+                )
+                self.db_conn.commit()
+                print("✅ Default admin account created successfully")
+        except sqlite3.Error as e:
+            print(f"❌ Error creating default admin: {e}")
+            # Don't raise the error, just log it
 
     # ==================== INITIAL DATA LOADING ====================
     

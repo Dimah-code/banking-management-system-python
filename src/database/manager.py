@@ -5,8 +5,8 @@ from datetime import datetime
 from typing import Optional, Tuple, List, Union
 from src.database.queries import *
 from config.settings import (
-    DATABASE_NAME, ADMIN_USERNAME, ADMIN_PASSWORD,
-    CSV_EXPORT_FILENAME, INITIAL_ACCOUNTS_FILE, DATABASE_PATH
+    ADMIN_USERNAME, ADMIN_PASSWORD, DATABASE_PATH,
+    CSV_EXPORT_FILENAME, INITIAL_ACCOUNTS_FILE
 )
 
 

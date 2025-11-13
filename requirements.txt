@@ -1,0 +1,4 @@
+-e git+ssh://git@github.com/dimah-code/banking-management-system-python.git@e321176ef425ea643fa941e8f881e0b044bc39c6#egg=banking_management_system
+dotenv==0.9.9
+python-dotenv==1.2.1
+setuptools==80.9.0

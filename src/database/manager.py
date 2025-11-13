@@ -3,8 +3,9 @@ import csv
 import os
 from datetime import datetime
 from typing import Optional, Tuple, List, Union
+from src.database.queries import *
 from config.settings import (
-    DATABASE_NAME, ADMIN_USERNAME, ADMIN_PASSWORD, 
+    DATABASE_NAME, ADMIN_USERNAME, ADMIN_PASSWORD,
     CSV_EXPORT_FILENAME, INITIAL_ACCOUNTS_FILE, DATABASE_PATH
 )
 
@@ -32,38 +33,9 @@ class DatabaseManager:
 
     def _initialize_database(self):
         """Create all necessary tables and default admin account."""
-        schema_scripts = [
-            # Accounts Table
-            """
-            CREATE TABLE IF NOT EXISTS accounts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                balance REAL NOT NULL DEFAULT 0.00
-            )
-            """,
-            # Transactions Table
-            """
-            CREATE TABLE IF NOT EXISTS transactions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                account_id INTEGER,
-                type TEXT NOT NULL, 
-                amount REAL NOT NULL,
-                timestamp TEXT NOT NULL,
-                description TEXT,
-                FOREIGN KEY(account_id) REFERENCES accounts(id)
-            )
-            """,
-            # Admins Table
-            """
-            CREATE TABLE IF NOT EXISTS admins (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
-            )
-            """
-        ]
-        
+
+        schema_scripts = [ACCOUNTS_TABLE, TRANSACTIONS_TABLE, ADMINS_TABLE]
+
         cursor = self.db_conn.cursor()
         try:
             for script in schema_scripts:
@@ -79,12 +51,9 @@ class DatabaseManager:
         """Create default admin account if it doesn't exist."""
         cursor = self.db_conn.cursor()
         try:
-            cursor.execute("SELECT id FROM admins WHERE username=?", (ADMIN_USERNAME,))
+            cursor.execute(FIND_ADMIN_BY_USERNAME, (ADMIN_USERNAME, ))
             if cursor.fetchone() is None:
-                cursor.execute(
-                    "INSERT INTO admins (username, password) VALUES (?, ?)", 
-                    (ADMIN_USERNAME, ADMIN_PASSWORD)
-                )
+                cursor.execute(CREATE_DEFAULT_ADMIN, (ADMIN_USERNAME, ADMIN_PASSWORD))
                 self.db_conn.commit()
                 print("✅ Default admin account created successfully")
         except sqlite3.Error as e:
@@ -105,7 +74,7 @@ class DatabaseManager:
     def _has_existing_data(self) -> bool:
         """Check if transactions table already has data."""
         cursor = self.db_conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM transactions")
+        cursor.execute(SELECT_ALL_TRANSACTIONS)
         return cursor.fetchone()[0] > 0
 
     def _import_transactions_from_csv(self):
@@ -173,10 +142,7 @@ class DatabaseManager:
         cursor = self.db_conn.cursor()
         
         # Insert transaction
-        cursor.execute("""
-            INSERT INTO transactions (account_id, type, amount, timestamp, description)
-            VALUES (?, ?, ?, ?, ?)
-        """, (account_id, tx_type, amount, timestamp, description))
+        cursor.execute(INSERT_TRANSACTION, (account_id, tx_type, amount, timestamp, description))
 
         # Update account balance
         self._update_balance_from_transaction(account_id, tx_type, amount)
@@ -194,30 +160,22 @@ class DatabaseManager:
         """Update account balance based on transaction type."""
         cursor = self.db_conn.cursor()
         if tx_type.lower() == "deposit":
-            cursor.execute("UPDATE accounts SET balance = balance + ? WHERE id=?", 
-                         (amount, account_id))
+            cursor.execute(UPDATE_BALANCE_DEPOSIT, (amount, account_id))
         elif tx_type.lower() == "withdraw":
-            cursor.execute("UPDATE accounts SET balance = balance - ? WHERE id=?", 
-                         (amount, account_id))
+            cursor.execute(UPDATE_BALANCE_WITHDRAW, (amount, account_id))
 
     # ==================== AUTHENTICATION METHODS ====================
     
     def check_admin_credentials(self, username: str, password: str) -> bool:
         """Verify admin credentials."""
         cursor = self.db_conn.cursor()
-        cursor.execute(
-            "SELECT id FROM admins WHERE username=? AND password=?", 
-            (username, password)
-        )
+        cursor.execute(CHECK_ADMIN_CREDENTIALS, (username, password))
         return cursor.fetchone() is not None
 
     def check_credentials(self, username: str, password: str) -> Optional[Tuple[int, str]]:
         """Verify user credentials and return user ID and username if valid."""
         cursor = self.db_conn.cursor()
-        cursor.execute(
-            "SELECT id, username FROM accounts WHERE username=? AND password=?", 
-            (username, password)
-        )
+        cursor.execute(CHECK_USER_CREDENTIALS, (username, password))
         return cursor.fetchone()
 
     # ==================== ACCOUNT MANAGEMENT ====================
@@ -238,10 +196,7 @@ class DatabaseManager:
         
         try:
             # Create account
-            cursor.execute(
-                "INSERT INTO accounts (username, password, balance) VALUES (?, ?, ?)", 
-                (username, password, initial_deposit)
-            )
+            cursor.execute(CREATE_ACCOUNT, (username, password, initial_deposit))
             
             # Record initial deposit transaction
             new_account_id = cursor.lastrowid
@@ -253,7 +208,7 @@ class DatabaseManager:
             
             self.db_conn.commit()
             return True
-            
+
         except sqlite3.IntegrityError:
             return "Username already exists."
         except sqlite3.Error as e:
@@ -272,24 +227,21 @@ class DatabaseManager:
     def get_balance(self, user_id: int) -> float:
         """Get current balance for user."""
         cursor = self.db_conn.cursor()
-        cursor.execute("SELECT balance FROM accounts WHERE id=?", (user_id,))
+        cursor.execute(GET_BALANCE, (user_id,))
         result = cursor.fetchone()
         return result[0] if result else 0.00
 
     def get_account_id_by_username(self, username: str) -> Optional[int]:
         """Get account ID by username."""
         cursor = self.db_conn.cursor()
-        cursor.execute("SELECT id FROM accounts WHERE username=?", (username,))
+        cursor.execute(GET_ACCOUNT_ID, (username,))
         result = cursor.fetchone()
         return result[0] if result else None
 
     def update_balance(self, user_id: int, amount: float):
         """Update user balance (positive for deposit, negative for withdrawal)."""
         cursor = self.db_conn.cursor()
-        cursor.execute(
-            "UPDATE accounts SET balance = balance + ? WHERE id=?", 
-            (amount, user_id)
-        )
+        cursor.execute(UPDATE_BALANCE, (amount, user_id))
         self.db_conn.commit()
 
     # ==================== TRANSACTION MANAGEMENT ====================
@@ -299,19 +251,13 @@ class DatabaseManager:
         """Record a transaction in the history."""
         cursor = self.db_conn.cursor()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cursor.execute("""
-            INSERT INTO transactions (account_id, type, amount, timestamp, description) 
-            VALUES (?, ?, ?, ?, ?)
-        """, (account_id, transaction_type, amount, timestamp, description))
+        cursor.execute(RECORD_TRANACTION, (account_id, transaction_type, amount, timestamp, description))
         self.db_conn.commit()
 
     def get_transaction_history(self, user_id: int) -> List[Tuple]:
         """Get transaction history for a specific user."""
         cursor = self.db_conn.cursor()
-        cursor.execute("""
-            SELECT timestamp, type, amount, description FROM transactions 
-            WHERE account_id=? ORDER BY timestamp DESC
-        """, (user_id,))
+        cursor.execute(GET_TRANSACTION, (user_id,))
         return cursor.fetchall()
 
     # ==================== ADMIN METHODS ====================
@@ -319,23 +265,13 @@ class DatabaseManager:
     def get_all_accounts_summary(self) -> List[Tuple]:
         """Get summary of all user accounts for admin dashboard."""
         cursor = self.db_conn.cursor()
-        cursor.execute("SELECT id, username, balance FROM accounts ORDER BY id ASC")
+        cursor.execute(GET_ALL_SUMMARIES)
         return cursor.fetchall()
         
     def get_all_transactions(self) -> List[Tuple]:
         """Get all transaction records across all users."""
         cursor = self.db_conn.cursor()
-        cursor.execute("""
-            SELECT 
-                t.timestamp, 
-                a.username, 
-                t.type, 
-                t.amount, 
-                t.description 
-            FROM transactions t
-            JOIN accounts a ON t.account_id = a.id
-            ORDER BY t.timestamp DESC
-        """)
+        cursor.execute(GET_ALL_TRANSACTIONS)
         return cursor.fetchall()
         
     def export_all_transactions_to_csv(self) -> Optional[str]:

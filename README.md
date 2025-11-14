@@ -120,7 +120,6 @@ python3 scripts/setup.py
 # Set your admin credentials and other configuration values
 ```
 
-5.**Edit username and 
 ### Usage
 
 1. **Run the application**

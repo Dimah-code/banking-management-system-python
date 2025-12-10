@@ -6,14 +6,14 @@ A secure banking application with user and admin interfaces.
 
 import sys
 import os
+from src.gui.app import BankingApp
 
 # Add src to Python path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def main():
     """Main application entry point."""
     try:
-        from gui.app import BankingApp
         print("🚀 Starting Banking Management System...")
         
         # Create and run the application

@@ -124,7 +124,7 @@ python3 scripts/setup.py
 
 1. **Run the application**
 ```sh
-python src/main.py
+python -m src.main
 ```
 
 2. **First-time setup**

@@ -88,7 +88,7 @@ To get a local copy up and running, follow these simple steps.
 
 1. **Clone the repository**
 ```sh
-git clone https://github.com/Dimah-code/banking-management-system-python.git
+git clone https://github.com/geekmanesh/banking-management-system-python.git
 cd banking-management-system-python
 ```
 
@@ -143,16 +143,13 @@ python -m src.main
 
 ## 👥 Authors <a id="authors"></a>
 
-👤 **Dimah-code**
+👤 **Geekmanesh**
 
-- GitHub: [@Dimah-code](https://github.com/Dimah-code)
-- LinkedIn: [Hamidreza](https://in/hamidreza-ghareghani-b68b712b9)
+- GitHub: [@geekmanesh](https://github.com/geekmanesh)
 
 👤 **mainlyNitin**
 
 - Github: [@mainlyNitin](https://github.com/mainlyNitin)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- FUTURE FEATURES -->
 
@@ -181,8 +178,6 @@ Contributions, issues, and feature requests are welcome!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- SUPPORT -->
 
 ## ⭐️ Show your support <a id="support"></a>
@@ -196,7 +191,6 @@ If you like this project, please give it a ⭐️! This helps others discover th
 - **Original Project**: This project is forked from [Banking-Management-Systems](https://github.com/mainlyNitin/Banking-Management-Systems) by [mainlyNitin](https://github.com/mainlyNitin)
 - Thanks to mainlyNitin for this good project that learn me a lot
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## 📝 License <a id="license"></a>
 
